@@ -5,6 +5,7 @@ import { SimpleUser } from '../types/general';
 import SurveyChoice from './survey-choice';
 import { timeago } from '../utils/timeago';
 import SmallTag from './small-tag';
+import { useSecondaryColor } from '../hooks/theme';
 
 type Props = {
   title: string;
@@ -30,7 +31,7 @@ export default function SurveyCard({
   tags,
   createdBy,
 }: Props) {
-  const borderColor = useColorModeValue('gray.200', 'gray.700');
+  const secondaryColor = useSecondaryColor();
 
   const [choicesHidden, setChoiceHidden] = useState(choices.length > DEFAULT_MAX_NUM_CHOICE);
   const choicesToShow = useMemo(() => {
@@ -38,15 +39,16 @@ export default function SurveyCard({
     return choices.slice(0, DEFAULT_MAX_NUM_CHOICE);
   }, [choicesHidden, choices]);
 
+  const bgColor = useColorModeValue('#FFFFFF', '#1E1E1E');
+
   return (
     <Box
       px={4}
       py={4}
       _notFirst={{
-        borderTopStyle: 'solid',
-        borderTopColor: borderColor,
-        borderTopWidth: '0.25rem',
+        mt: 2,
       }}
+      bgColor={bgColor}
     >
       <HStack spacing={1} mb={1}>
         {tags.map((tag, index) => (
@@ -61,7 +63,7 @@ export default function SurveyCard({
           <Flex mb={1} gap={1} alignItems={'center'}>
             <Text fontSize={'sm'} fontWeight={500}>{`Q. ${subTitle}`}</Text>
             {numQuestions > 1 ? (
-              <Text fontSize="xs" color={'gray.500'} fontWeight={500}>{`외 ${
+              <Text fontSize="xs" fontWeight={500} className={'text-secondary'}>{`외 ${
                 numQuestions - 1
               }문항`}</Text>
             ) : null}
@@ -76,7 +78,7 @@ export default function SurveyCard({
       {choicesHidden ? (
         <Text
           fontSize={'xs'}
-          color={'grey'}
+          color={secondaryColor}
           mt={1}
           fontWeight={500}
           textAlign={'end'}
@@ -84,7 +86,7 @@ export default function SurveyCard({
         >{`외 ${choices.length - DEFAULT_MAX_NUM_CHOICE} 선택지 모두 보기`}</Text>
       ) : null}
       <Flex mt={2}>
-        <HStack fontSize={'xs'} color={'grey'} spacing={0.5}>
+        <HStack fontSize={'xs'} spacing={0.5} className={'text-secondary'}>
           <Text>{createdBy?.name || '익명'}</Text>
           <Text>•</Text>
           <Text>{timeago('2022-12-31 15:32')}</Text>

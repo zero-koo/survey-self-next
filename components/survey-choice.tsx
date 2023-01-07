@@ -1,5 +1,5 @@
 import { Box, Flex, Spacer, Text } from '@chakra-ui/react';
-import { PRIMARY_COLOR } from '../palette';
+import { useSecondaryColor, usePrimaryColor } from '../hooks/theme';
 
 type Props = {
   text: string;
@@ -14,15 +14,18 @@ export default function SurveyChoice({
   isOpen = false,
   isSelected = false,
 }: Props) {
+  const primaryColor = usePrimaryColor();
+  const secondaryColor = useSecondaryColor();
+
   return (
     <Flex
       as="button"
       position={'relative'}
       w="100%"
-      border={'1px solid gray'}
+      borderWidth={'1px'}
       borderRadius={'0.25rem'}
-      borderColor={isSelected ? PRIMARY_COLOR : 'gray'}
-      color={isSelected ? PRIMARY_COLOR : 'gray'}
+      borderColor={isSelected ? primaryColor : secondaryColor}
+      color={isSelected ? primaryColor : secondaryColor}
       px={1.5}
       py={1}
       fontSize={'xs'}
@@ -37,7 +40,7 @@ export default function SurveyChoice({
             w={`${percent}%`}
             borderRadius={'0.1875rem'}
             height={'100%'}
-            backgroundColor={isSelected ? PRIMARY_COLOR : 'gray'}
+            backgroundColor={isSelected ? primaryColor : secondaryColor}
             opacity={0.15}
           ></Box>
         ) : null}
