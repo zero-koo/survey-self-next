@@ -1,6 +1,5 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-
-import { PrismaClient } from '@prisma/client';
+import { Prisma, PrismaClient } from '@prisma/client';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const prisma = new PrismaClient();
@@ -8,22 +7,42 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   const { body, method } = req;
 
   try {
-    if (method === 'POST') {
-      const { name, email } = JSON.parse(body) as {
-        [key: string]: string;
-      };
+    switch (method) {
+      case 'POST': {
+        const { name, email, password } = JSON.parse(body) as {
+          [key: string]: string;
+        };
 
-      console.log('body', body);
+        if (!name || !email || !password) {
+          res.status(400).json({ error: 'Missing required data!' });
+          return;
+        }
 
-      const { id } = await prisma.user.create({
-        data: {
-          name,
-          email,
-        },
-      });
-
-      res.status(200).json({ id, name, email });
+        try {
+          const { id } = await prisma.user.create({
+            data: {
+              name,
+              email,
+              password,
+            },
+          });
+          res.status(200).json({ id, name, email });
+        } catch (e) {
+          if (e instanceof Prisma.PrismaClientKnownRequestError) {
+            const [duplecated] = e.meta?.target as string[];
+            if (e.code === 'P2002') {
+              res.status(409).json({ error: `This ${duplecated} has already been registered.` });
+            }
+          }
+        }
+        return;
+      }
+      default: {
+        throw Error;
+      }
     }
+  } catch (e) {
+    res.status(500).json({ error: 'Request failed!' });
   } finally {
     prisma.$disconnect();
   }
